@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Quality Category -->
+    <PreferenceCategory
+        android:title="Quality"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="pref_quality"
+            android:title="Quality Preset"
+            android:summary="%s"
+            android:entries="@array/quality_entries"
+            android:entryValues="@array/quality_values"
+            android:defaultValue="2"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Resolution Category -->
+    <PreferenceCategory
+        android:title="Resolution Scaling"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="pref_dynamic_resolution"
+            android:title="Dynamic Resolution"
+            android:summary="Automatically adjust resolution to maintain target FPS"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:key="pref_min_resolution"
+            android:title="Minimum Resolution"
+            android:summary="Lowest resolution scale when FPS drops"
+            android:defaultValue="50"
+            android:max="100"
+            app:min="25"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:key="pref_max_resolution"
+            android:title="Maximum Resolution"
+            android:summary="Highest resolution scale"
+            android:defaultValue="100"
+            android:max="150"
+            app:min="50"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:key="pref_target_fps"
+            android:title="Target FPS"
+            android:summary="Target frame rate for dynamic scaling"
+            android:defaultValue="60"
+            android:max="120"
+            app:min="20"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Performance Category -->
+    <PreferenceCategory
+        android:title="Performance"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="pref_draw_batching"
+            android:title="Draw Call Batching"
+            android:summary="Combine multiple draw calls to reduce overhead"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_instancing"
+            android:title="Instanced Rendering"
+            android:summary="Use GPU instancing for repeated geometry"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_shader_cache"
+            android:title="Shader Cache"
+            android:summary="Cache compiled shaders for faster loading"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_gpu_tweaks"
+            android:title="GPU-Specific Optimizations"
+            android:summary="Apply optimizations for your GPU (Adreno, Mali, etc.)"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Textures Category -->
+    <PreferenceCategory
+        android:title="Textures"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="pref_texture_quality"
+            android:title="Texture Quality"
+            android:summary="%s"
+            android:entries="@array/texture_quality_entries"
+            android:entryValues="@array/texture_quality_values"
+            android:defaultValue="2"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="pref_max_texture_size"
+            android:title="Max Texture Size"
+            android:summary="%s"
+            android:entries="@array/texture_size_entries"
+            android:entryValues="@array/texture_size_values"
+            android:defaultValue="4096"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="pref_anisotropic"
+            android:title="Anisotropic Filtering"
+            android:summary="%s"
+            android:entries="@array/anisotropic_entries"
+            android:entryValues="@array/anisotropic_values"
+            android:defaultValue="4"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Debug Category -->
+    <PreferenceCategory
+        android:title="Debug"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="pref_debug_overlay"
+            android:title="Debug Overlay"
+            android:summary="Show FPS and performance statistics on screen"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="pref_clear_cache"
+            android:title="Clear Shader Cache"
+            android:summary="Current size: 0 MB"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- About Category -->
+    <PreferenceCategory
+        android:title="About"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="pref_gpu_info"
+            android:title="GPU Information"
+            android:summary="Unknown"
+            android:selectable="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="pref_version"
+            android:title="Version"
+            android:summary="VelocityGL v1.0.0"
+            android:selectable="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="pref_reset_defaults"
+            android:title="Reset to Defaults"
+            android:summary="Restore all settings to default values"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
