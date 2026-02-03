@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h> // Важно для size_t
 
 #ifdef __cplusplus
 extern "C" {
