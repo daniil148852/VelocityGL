@@ -5,7 +5,7 @@
 #ifndef VELOCITY_CONFIG_H
 #define VELOCITY_CONFIG_H
 
-#include "../velocity_gl.h"
+#include "../../include/velocity_gl.h"
 #include <stdbool.h>
 
 #ifdef __cplusplus
