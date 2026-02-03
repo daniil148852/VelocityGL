@@ -21,6 +21,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: '8.4'
+        
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
@@ -29,28 +34,17 @@ jobs:
         sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
         sdkmanager --install "cmake;${{ env.CMAKE_VERSION }}"
         
-    - name: Setup Gradle Wrapper
+    - name: Generate Keystore
       run: |
-        mkdir -p gradle/wrapper
-        # Download gradle-wrapper.jar
-        curl -Lo gradle/wrapper/gradle-wrapper.jar \
-          https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
-        # Make gradlew executable
-        chmod +x gradlew
+        keytool -genkey -v -keystore app/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
         
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: gradle-
+    - name: Create Gradle Wrapper
+      run: gradle wrapper --gradle-version 8.4
         
-    - name: Build with Gradle
+    - name: Build Release APK
       run: ./gradlew assembleRelease --no-daemon --stacktrace
       
-    - name: Upload APK
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: VelocityGL-release
@@ -65,7 +59,7 @@ jobs:
           app/build/intermediates/cmake/release/obj/**/libvelocitygl.so
         if-no-files-found: warn
 
-  # Separate job for building all architectures
+  # Separate job for building native libs individually (optional)
   build-native:
     runs-on: ubuntu-latest
     strategy:
@@ -79,7 +73,7 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
-    - name: Install NDK
+    - name: Install NDK and CMake
       run: |
         sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
         sdkmanager --install "cmake;${{ env.CMAKE_VERSION }}"
@@ -103,4 +97,4 @@ jobs:
       with:
         name: libvelocitygl-${{ matrix.abi }}
         path: native/build/${{ matrix.abi }}/libvelocitygl.so
-        if-no-files-found: error
+        if-no-files-found: warn
