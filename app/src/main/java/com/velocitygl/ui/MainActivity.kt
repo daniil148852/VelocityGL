@@ -18,6 +18,7 @@ import com.velocitygl.databinding.ActivityMainBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import com.velocitygl.R
 
 /**
  * Main Activity - Dashboard and quick settings
