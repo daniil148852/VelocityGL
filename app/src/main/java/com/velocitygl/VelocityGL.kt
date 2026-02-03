@@ -322,7 +322,6 @@ data class RendererStats(
 ) {
     companion object {
         fun fromJson(json: String): RendererStats {
-            // Simple JSON parsing (production would use Gson)
             val map = parseSimpleJson(json)
             return RendererStats(
                 fps = (map["fps"] as? Number)?.toFloat() ?: 0f,
@@ -339,8 +338,8 @@ data class RendererStats(
             )
         }
         
-        private fun parseSimpleJson(json: String): Map<String, Any> {
-            // Very simple JSON parser for flat objects
+        // Changed to public/internal so GPUInfo can access it
+        internal fun parseSimpleJson(json: String): Map<String, Any> {
             val result = mutableMapOf<String, Any>()
             val content = json.trim().removeSurrounding("{", "}")
             
@@ -380,6 +379,7 @@ data class GPUInfo(
 ) {
     companion object {
         fun fromJson(json: String): GPUInfo {
+            // Using internal method from RendererStats
             val map = RendererStats.parseSimpleJson(json)
             return GPUInfo(
                 vendor = map["vendor"] as? String ?: "Unknown",
@@ -391,8 +391,5 @@ data class GPUInfo(
                 hasGeometryShaders = map["hasGeometryShaders"] as? Boolean ?: false
             )
         }
-        
-        private fun parseSimpleJson(json: String): Map<String, Any> = 
-            RendererStats.parseSimpleJson(json)
     }
 }
