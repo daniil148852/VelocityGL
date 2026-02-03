@@ -8,7 +8,7 @@ env:
   CMAKE_VERSION: '3.22.1'
 
 jobs:
-  build-native:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,10 +24,19 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
-    - name: Install NDK
+    - name: Install NDK and CMake
       run: |
         sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
         sdkmanager --install "cmake;${{ env.CMAKE_VERSION }}"
+        
+    - name: Setup Gradle Wrapper
+      run: |
+        mkdir -p gradle/wrapper
+        # Download gradle-wrapper.jar
+        curl -Lo gradle/wrapper/gradle-wrapper.jar \
+          https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
+        # Make gradlew executable
+        chmod +x gradlew
         
     - name: Cache Gradle
       uses: actions/cache@v4
@@ -38,31 +47,31 @@ jobs:
         key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: gradle-
         
-    - name: Build Native Library
-      run: |
-        chmod +x gradlew
-        ./gradlew :native:assembleRelease
-        
-    - name: Build Android App
-      run: ./gradlew :app:assembleRelease
+    - name: Build with Gradle
+      run: ./gradlew assembleRelease --no-daemon --stacktrace
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: VelocityGL-release
         path: app/build/outputs/apk/release/*.apk
+        if-no-files-found: warn
         
     - name: Upload Native Libs
       uses: actions/upload-artifact@v4
       with:
         name: native-libs
-        path: native/build/outputs/native-libs/
+        path: |
+          app/build/intermediates/cmake/release/obj/**/libvelocitygl.so
+        if-no-files-found: warn
 
-  build-all-archs:
+  # Separate job for building all architectures
+  build-native:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        abi: [armeabi-v7a, arm64-v8a, x86, x86_64]
+        abi: [armeabi-v7a, arm64-v8a, x86_64]
+      fail-fast: false
     
     steps:
     - uses: actions/checkout@v4
@@ -71,18 +80,22 @@ jobs:
       uses: android-actions/setup-android@v3
       
     - name: Install NDK
-      run: sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
-      
-    - name: Build for ${{ matrix.abi }}
       run: |
-        cd native
-        mkdir -p build/${{ matrix.abi }}
-        cd build/${{ matrix.abi }}
+        sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
+        sdkmanager --install "cmake;${{ env.CMAKE_VERSION }}"
+        
+    - name: Build Native Library for ${{ matrix.abi }}
+      run: |
+        mkdir -p native/build/${{ matrix.abi }}
+        cd native/build/${{ matrix.abi }}
+        
         cmake ../.. \
           -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
           -DANDROID_ABI=${{ matrix.abi }} \
           -DANDROID_PLATFORM=android-26 \
+          -DANDROID_STL=c++_shared \
           -DCMAKE_BUILD_TYPE=Release
+          
         cmake --build . -j$(nproc)
         
     - name: Upload ${{ matrix.abi }} library
@@ -90,3 +103,4 @@ jobs:
       with:
         name: libvelocitygl-${{ matrix.abi }}
         path: native/build/${{ matrix.abi }}/libvelocitygl.so
+        if-no-files-found: error
