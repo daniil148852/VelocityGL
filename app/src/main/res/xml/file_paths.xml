@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- External files directory -->
+    <external-files-path
+        name="external_files"
+        path="." />
+    
+    <!-- Cache directory -->
+    <cache-path
+        name="cache"
+        path="." />
+    
+    <!-- External cache -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+    
+    <!-- Config files -->
+    <files-path
+        name="config"
+        path="config/" />
+    
+    <!-- Shader cache -->
+    <external-files-path
+        name="shader_cache"
+        path="cache/shaders/" />
+    
+    <!-- Logs -->
+    <external-files-path
+        name="logs"
+        path="logs/" />
+        
+</paths>
