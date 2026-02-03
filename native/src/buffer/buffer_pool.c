@@ -11,6 +11,28 @@
 #include <pthread.h>
 
 // ============================================================================
+// Forward declarations
+// ============================================================================
+
+bool glExtensionSupported(const char* extension);
+
+// ============================================================================
+// GL Extension constants (not in standard GLES headers)
+// ============================================================================
+
+#ifndef GL_MAP_PERSISTENT_BIT
+#define GL_MAP_PERSISTENT_BIT 0x0040
+#endif
+
+#ifndef GL_MAP_COHERENT_BIT
+#define GL_MAP_COHERENT_BIT 0x0080
+#endif
+
+// Function pointer for glBufferStorage
+typedef void (*PFNGLBUFFERSTORAGEPROC)(GLenum target, GLsizeiptr size, const void* data, GLbitfield flags);
+static PFNGLBUFFERSTORAGEPROC glBufferStorageEXT = NULL;
+
+// ============================================================================
 // Global State
 // ============================================================================
 
@@ -26,10 +48,13 @@ static size_t alignSize(size_t size, size_t alignment) {
 }
 
 static bool checkPersistentMappingSupport(void) {
-    // Check for GL_EXT_buffer_storage or ES 3.2
-    return gpuHasExtension("GL_EXT_buffer_storage") ||
-           (g_wrapperCtx && g_wrapperCtx->gpuCaps.glesVersionMajor >= 3 &&
-            g_wrapperCtx->gpuCaps.glesVersionMinor >= 2);
+    bool hasExtension = glExtensionSupported("GL_EXT_buffer_storage");
+    
+    if (hasExtension && !glBufferStorageEXT) {
+        glBufferStorageEXT = (PFNGLBUFFERSTORAGEPROC)eglGetProcAddress("glBufferStorageEXT");
+    }
+    
+    return hasExtension && glBufferStorageEXT != NULL;
 }
 
 // ============================================================================
@@ -65,11 +90,12 @@ bool bufferManagerInit(size_t poolSize) {
     glGenBuffers(1, &g_bufMgr->streamBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, g_bufMgr->streamBuffer);
     
-    if (g_bufMgr->persistentMappingSupported) {
+    if (g_bufMgr->persistentMappingSupported && glBufferStorageEXT) {
         // Use persistent mapping for best performance
         GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-        glBufferStorage(GL_ARRAY_BUFFER, streamSize, NULL, flags);
-        g_bufMgr->streamMappedPtr = glMapBufferRange(GL_ARRAY_BUFFER, 0, streamSize, flags);
+        glBufferStorageEXT(GL_ARRAY_BUFFER, streamSize, NULL, flags);
+        g_bufMgr->streamMappedPtr = glMapBufferRange(GL_ARRAY_BUFFER, 0, streamSize, 
+                                                      GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
         
         if (!g_bufMgr->streamMappedPtr) {
             velocityLogWarn("Persistent mapping failed, falling back to standard");
@@ -166,12 +192,14 @@ int bufferPoolCreate(BufferTarget target, BufferUsage usage, size_t size) {
     glBindBuffer(target, pool->bufferId);
     
     bool usePersistent = g_bufMgr->persistentMappingSupported && 
+                         glBufferStorageEXT &&
                          (usage == BUFFER_USAGE_DYNAMIC || usage == BUFFER_USAGE_STREAM);
     
     if (usePersistent) {
         GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-        glBufferStorage(target, size, NULL, flags);
-        pool->mappedPtr = glMapBufferRange(target, 0, size, flags);
+        glBufferStorageEXT(target, size, NULL, flags);
+        pool->mappedPtr = glMapBufferRange(target, 0, size, 
+                                            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
         pool->persistentMapped = (pool->mappedPtr != NULL);
     } else {
         glBufferData(target, size, NULL, usage);
@@ -341,7 +369,6 @@ void bufferPoolFree(BufferAllocation* alloc) {
                 }
                 velocityFree(next);
                 pool->blockCount--;
-                pool->fragmentCount--;
             }
             
             // Coalesce with previous block
@@ -354,7 +381,6 @@ void bufferPoolFree(BufferAllocation* alloc) {
                 }
                 velocityFree(block);
                 pool->blockCount--;
-                pool->fragmentCount--;
             }
             
             break;
@@ -556,7 +582,6 @@ void bufferManagerGetStats(size_t* totalAllocated, size_t* totalUsed, uint32_t* 
 }
 
 void bufferPoolDefragment(int poolIndex) {
-    // TODO: Implement defragmentation during loading screens
     velocityLogInfo("Buffer pool %d defragmentation requested", poolIndex);
 }
 
