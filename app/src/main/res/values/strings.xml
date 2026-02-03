@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VelocityGL</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Status -->
+    <string name="status_ready">Ready</string>
+    <string name="status_loaded">Library Loaded</string>
+    <string name="status_not_loaded">Not Loaded</string>
+    <string name="status_initializing">Initializing…</string>
+    
+    <!-- Actions -->
+    <string name="action_initialize">Initialize</string>
+    <string name="action_shutdown">Shutdown</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_clear_cache">Clear Cache</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_export">Export</string>
+    <string name="action_import">Import</string>
+    
+    <!-- Quality Presets -->
+    <string name="quality_ultra_low">Ultra Low</string>
+    <string name="quality_low">Low</string>
+    <string name="quality_medium">Medium</string>
+    <string name="quality_high">High</string>
+    <string name="quality_ultra">Ultra</string>
+    
+    <!-- Settings -->
+    <string name="pref_category_quality">Quality</string>
+    <string name="pref_category_resolution">Resolution Scaling</string>
+    <string name="pref_category_performance">Performance</string>
+    <string name="pref_category_textures">Textures</string>
+    <string name="pref_category_debug">Debug</string>
+    <string name="pref_category_about">About</string>
+    
+    <string name="pref_quality_preset">Quality Preset</string>
+    <string name="pref_dynamic_resolution">Dynamic Resolution</string>
+    <string name="pref_dynamic_resolution_summary">Automatically adjust resolution to maintain target FPS</string>
+    <string name="pref_min_resolution">Minimum Resolution</string>
+    <string name="pref_max_resolution">Maximum Resolution</string>
+    <string name="pref_target_fps">Target FPS</string>
+    <string name="pref_draw_batching">Draw Call Batching</string>
+    <string name="pref_draw_batching_summary">Combine multiple draw calls to reduce overhead</string>
+    <string name="pref_instancing">Instanced Rendering</string>
+    <string name="pref_instancing_summary">Use GPU instancing for repeated geometry</string>
+    <string name="pref_shader_cache">Shader Cache</string>
+    <string name="pref_shader_cache_summary">Cache compiled shaders for faster loading</string>
+    <string name="pref_gpu_tweaks">GPU-Specific Optimizations</string>
+    <string name="pref_gpu_tweaks_summary">Apply optimizations for your GPU</string>
+    <string name="pref_texture_quality">Texture Quality</string>
+    <string name="pref_max_texture_size">Max Texture Size</string>
+    <string name="pref_anisotropic">Anisotropic Filtering</string>
+    <string name="pref_debug_overlay">Debug Overlay</string>
+    <string name="pref_debug_overlay_summary">Show FPS and performance statistics</string>
+    <string name="pref_clear_cache">Clear Shader Cache</string>
+    <string name="pref_gpu_info">GPU Information</string>
+    <string name="pref_version">Version</string>
+    <string name="pref_reset_defaults">Reset to Defaults</string>
+    
+    <!-- Stats -->
+    <string name="stat_fps">FPS</string>
+    <string name="stat_frame_time">Frame Time</string>
+    <string name="stat_draw_calls">Draw Calls</string>
+    <string name="stat_triangles">Triangles</string>
+    <string name="stat_resolution">Resolution</string>
+    <string name="stat_cache">Cache</string>
+    
+    <!-- Messages -->
+    <string name="msg_initialized">VelocityGL initialized successfully</string>
+    <string name="msg_init_failed">Failed to initialize VelocityGL</string>
+    <string name="msg_cache_cleared">Shader cache cleared</string>
+    <string name="msg_settings_reset">Settings reset to defaults</string>
+    <string name="msg_config_exported">Configuration exported</string>
+    <string name="msg_config_imported">Configuration imported</string>
+    <string name="msg_permission_required">Storage permission required for shader cache</string>
+    
+    <!-- Descriptions -->
+    <string name="desc_renderer">High-performance OpenGL 4.5 renderer for Minecraft Java Edition</string>
+    <string name="desc_features">Features: Shader caching, Dynamic resolution, Draw batching, GPU optimizations</string>
+</resources>
