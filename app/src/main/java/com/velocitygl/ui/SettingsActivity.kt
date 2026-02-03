@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.*
 import com.velocitygl.*
 import com.velocitygl.databinding.ActivitySettingsBinding
+// Ensure R is imported correctly
+import com.velocitygl.R
 
 /**
  * Settings Activity - Detailed configuration
@@ -50,6 +52,9 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun setupPreferences() {
+            // ... (rest of the file remains the same)
+            // Just ensure R references are resolved
+            
             // Quality preset
             findPreference<ListPreference>("pref_quality")?.apply {
                 setOnPreferenceChangeListener { _, newValue ->
