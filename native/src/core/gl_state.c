@@ -8,16 +8,17 @@
 #include <string.h>
 
 // ============================================================================
+// Forward Declarations
+// ============================================================================
+
+void glStateApply(const GLState* state);
+
+// ============================================================================
 // State Comparison Helpers
 // ============================================================================
 
 static inline bool floatEquals(float a, float b) {
     return (a > b ? a - b : b - a) < 0.0001f;
-}
-
-static inline bool float4Equals(const float* a, const float* b) {
-    return floatEquals(a[0], b[0]) && floatEquals(a[1], b[1]) &&
-           floatEquals(a[2], b[2]) && floatEquals(a[3], b[3]);
 }
 
 // ============================================================================
