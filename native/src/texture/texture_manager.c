@@ -12,6 +12,36 @@
 #include <pthread.h>
 
 // ============================================================================
+// Forward declarations
+// ============================================================================
+
+bool glExtensionSupported(const char* extension);
+
+// ============================================================================
+// GL Extension constants
+// ============================================================================
+
+#ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
+#ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#endif
+
+#ifndef GL_COMPRESSED_RGBA_ASTC_4x4_KHR
+#define GL_COMPRESSED_RGBA_ASTC_4x4_KHR 0x93B0
+#endif
+
+#ifndef GL_COMPRESSED_RGBA_ASTC_6x6_KHR
+#define GL_COMPRESSED_RGBA_ASTC_6x6_KHR 0x93B4
+#endif
+
+#ifndef GL_COMPRESSED_RGBA_ASTC_8x8_KHR
+#define GL_COMPRESSED_RGBA_ASTC_8x8_KHR 0x93B7
+#endif
+
+// ============================================================================
 // Global State
 // ============================================================================
 
@@ -274,7 +304,7 @@ Texture* textureCreate(const TextureParams* params) {
     }
     
     // Anisotropic filtering
-    if (params->anisotropy > 1.0f && gpuHasExtension("GL_EXT_texture_filter_anisotropic")) {
+    if (params->anisotropy > 1.0f && glExtensionSupported("GL_EXT_texture_filter_anisotropic")) {
         glTexParameterf(params->type, GL_TEXTURE_MAX_ANISOTROPY_EXT, params->anisotropy);
     }
     
@@ -416,7 +446,7 @@ void textureSetWrap(Texture* texture, TextureWrap s, TextureWrap t, TextureWrap 
 void textureSetAnisotropy(Texture* texture, float anisotropy) {
     if (!texture || texture->id == 0) return;
     
-    if (gpuHasExtension("GL_EXT_texture_filter_anisotropic")) {
+    if (glExtensionSupported("GL_EXT_texture_filter_anisotropic")) {
         glBindTexture(texture->type, texture->id);
         glTexParameterf(texture->type, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
         glBindTexture(texture->type, 0);
