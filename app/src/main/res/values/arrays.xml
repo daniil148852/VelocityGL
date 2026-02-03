@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- Quality Preset -->
+    <string-array name="quality_entries">
+        <item>Ultra Low - Maximum FPS</item>
+        <item>Low</item>
+        <item>Medium (Recommended)</item>
+        <item>High</item>
+        <item>Ultra - Best Quality</item>
+    </string-array>
+    
+    <string-array name="quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    
+    <!-- Texture Quality -->
+    <string-array name="texture_quality_entries">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Ultra</item>
+    </string-array>
+    
+    <string-array name="texture_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    
+    <!-- Max Texture Size -->
+    <string-array name="texture_size_entries">
+        <item>512</item>
+        <item>1024</item>
+        <item>2048</item>
+        <item>4096</item>
+        <item>8192</item>
+    </string-array>
+    
+    <string-array name="texture_size_values">
+        <item>512</item>
+        <item>1024</item>
+        <item>2048</item>
+        <item>4096</item>
+        <item>8192</item>
+    </string-array>
+    
+    <!-- Anisotropic Filtering -->
+    <string-array name="anisotropic_entries">
+        <item>Off</item>
+        <item>2x</item>
+        <item>4x</item>
+        <item>8x</item>
+        <item>16x</item>
+    </string-array>
+    
+    <string-array name="anisotropic_values">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+    </string-array>
+    
+    <!-- Target FPS options -->
+    <string-array name="fps_entries">
+        <item>30 FPS</item>
+        <item>45 FPS</item>
+        <item>60 FPS</item>
+        <item>90 FPS</item>
+        <item>120 FPS</item>
+    </string-array>
+    
+    <string-array name="fps_values">
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array>
+    
+</resources>
