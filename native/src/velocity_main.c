@@ -14,10 +14,13 @@
 #include "gl/gl_functions.h"
 #include "utils/log.h"
 #include "utils/memory.h"
+#include "utils/config.h"
 
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 // ============================================================================
 // Version Info
@@ -114,12 +117,6 @@ VELOCITY_API bool velocityInit(const VelocityConfig* config) {
     }
     
     velocityLogInfo("VelocityGL initialized successfully");
-    velocityLogInfo("  Quality: %d", cfg.quality);
-    velocityLogInfo("  Shader Cache: %s", 
-                    cfg.shaderCache == VELOCITY_CACHE_DISABLED ? "disabled" :
-                    cfg.shaderCache == VELOCITY_CACHE_MEMORY_ONLY ? "memory" : "disk");
-    velocityLogInfo("  Dynamic Resolution: %s", cfg.enableDynamicResolution ? "yes" : "no");
-    velocityLogInfo("  Draw Batching: %s", cfg.enableDrawBatching ? "yes" : "no");
     
     return true;
 }
@@ -400,24 +397,20 @@ VELOCITY_API void velocitySetDynamicResolution(bool enabled) {
 VELOCITY_API void velocityTrimMemory(int level) {
     velocityLogInfo("Trimming memory (level: %d)...", level);
     
-    // Different levels of trimming
     switch (level) {
-        case 0:  // Light trim
+        case 0:
             bufferManagerTrim();
             break;
-            
-        case 1:  // Medium trim
+        case 1:
             bufferManagerTrim();
             textureManagerTrim(textureManagerGetMemoryUsage() / 2);
             break;
-            
-        case 2:  // Heavy trim
+        case 2:
             bufferManagerTrim();
             textureManagerTrim(textureManagerGetMemoryUsage() / 4);
             shaderCacheClear();
             break;
-            
-        default:  // Emergency trim
+        default:
             bufferManagerTrim();
             textureCacheClear();
             shaderCacheClear();
@@ -445,51 +438,16 @@ VELOCITY_API size_t velocityGetMemoryUsage(void) {
 // ============================================================================
 
 VELOCITY_API void* velocityGetProcAddress(const char* procName) {
-    if (!procName) {
-        return NULL;
-    }
+    if (!procName) return NULL;
     
-    // Check our wrapped functions first
     void* proc = glFunctionsGetProc(procName);
+    if (proc) return proc;
     
-    if (proc) {
-        return proc;
-    }
-    
-    // Fall back to native EGL lookup
     return (void*)eglGetProcAddress(procName);
 }
 
 // ============================================================================
-// Library Entry Points (for dlopen)
-// ============================================================================
-
-// These are the standard entry points that launchers look for
-
-void* glXGetProcAddress(const char* procName) {
-    return velocityGetProcAddress(procName);
-}
-
-void* glXGetProcAddressARB(const char* procName) {
-    return velocityGetProcAddress(procName);
-}
-
-// OSMesa compatibility (for some launchers)
-void* OSMesaGetProcAddress(const char* procName) {
-    return velocityGetProcAddress(procName);
-}
-
-// EGL passthrough
-EGLBoolean eglInitialize_velocity(EGLDisplay dpy, EGLint* major, EGLint* minor) {
-    return eglInitialize(dpy, major, minor);
-}
-
-EGLBoolean eglTerminate_velocity(EGLDisplay dpy) {
-    return eglTerminate(dpy);
-}
-
-// ============================================================================
-// JNI Entry Points (for Android app integration)
+// JNI Entry Points
 // ============================================================================
 
 #include <jni.h>
@@ -523,15 +481,12 @@ Java_com_velocitygl_VelocityGL_nativeShutdown(JNIEnv* env, jclass clazz) {
 JNIEXPORT jboolean JNICALL
 Java_com_velocitygl_VelocityGL_nativeCreateContext(JNIEnv* env, jclass clazz, 
                                                     jobject surface, jlong eglDisplay) {
-    // Get native window from Surface
     ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
     if (!window) {
         return JNI_FALSE;
     }
     
-    jboolean result = velocityCreateContext(window, (void*)eglDisplay) ? JNI_TRUE : JNI_FALSE;
-    
-    return result;
+    return velocityCreateContext(window, (void*)eglDisplay) ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT void JNICALL
