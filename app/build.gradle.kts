@@ -30,6 +30,17 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            // For testing purposes, use the debug keystore
+            // In production, use a real keystore
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -38,6 +49,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release") // Sign with debug key
             
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
