@@ -14,6 +14,26 @@
 #include <pthread.h>
 
 // ============================================================================
+// OpenGL constants not in ES (for compatibility)
+// ============================================================================
+
+#ifndef GL_FILL
+#define GL_FILL 0x1B02
+#endif
+
+#ifndef GL_MODELVIEW
+#define GL_MODELVIEW 0x1700
+#endif
+
+#ifndef GL_PROJECTION
+#define GL_PROJECTION 0x1701
+#endif
+
+#ifndef GL_TEXTURE
+#define GL_TEXTURE 0x1702
+#endif
+
+// ============================================================================
 // Global State
 // ============================================================================
 
@@ -376,6 +396,8 @@ void glWrapperPopState(void) {
 }
 
 void glWrapperApplyStateDelta(const GLState* newState) {
+    if (!g_wrapperCtx || !newState) return;
+    
     GLState* cur = &g_wrapperCtx->state;
     
     // Apply only changed blend state
@@ -424,8 +446,6 @@ void glWrapperApplyStateDelta(const GLState* newState) {
     if (cur->rasterizer.cullMode != newState->rasterizer.cullMode) {
         glCullFace(newState->rasterizer.cullMode);
     }
-    
-    // Continue for other states...
 }
 
 // ============================================================================
