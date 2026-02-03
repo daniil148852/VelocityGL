@@ -41,13 +41,15 @@ void glExtensionsLoad(void) {
             }
             
             g_extensionString = (char*)malloc(totalLen + 1);
-            g_extensionString[0] = '\0';
-            
-            for (GLint i = 0; i < numExtensions; i++) {
-                const char* ext = (const char*)glGetStringi(GL_EXTENSIONS, i);
-                if (ext) {
-                    strcat(g_extensionString, ext);
-                    strcat(g_extensionString, " ");
+            if (g_extensionString) {
+                g_extensionString[0] = '\0';
+                
+                for (GLint i = 0; i < numExtensions; i++) {
+                    const char* ext = (const char*)glGetStringi(GL_EXTENSIONS, i);
+                    if (ext) {
+                        strcat(g_extensionString, ext);
+                        strcat(g_extensionString, " ");
+                    }
                 }
             }
             
@@ -57,31 +59,37 @@ void glExtensionsLoad(void) {
         g_extensionString = strdup(extensions);
         
         // Count extensions
-        g_extensionCount = 0;
-        const char* p = g_extensionString;
-        while (*p) {
-            while (*p == ' ') p++;
-            if (*p) {
-                g_extensionCount++;
-                while (*p && *p != ' ') p++;
+        if (g_extensionString) {
+            g_extensionCount = 0;
+            const char* p = g_extensionString;
+            while (*p) {
+                while (*p == ' ') p++;
+                if (*p) {
+                    g_extensionCount++;
+                    while (*p && *p != ' ') p++;
+                }
             }
         }
     }
     
     // Build extension list
-    if (g_extensionCount > 0) {
+    if (g_extensionCount > 0 && g_extensionString) {
         g_extensionList = (char**)malloc(g_extensionCount * sizeof(char*));
         
-        char* str = strdup(g_extensionString);
-        char* token = strtok(str, " ");
-        int i = 0;
-        
-        while (token && i < g_extensionCount) {
-            g_extensionList[i++] = strdup(token);
-            token = strtok(NULL, " ");
+        if (g_extensionList) {
+            char* str = strdup(g_extensionString);
+            if (str) {
+                char* token = strtok(str, " ");
+                int i = 0;
+                
+                while (token && i < g_extensionCount) {
+                    g_extensionList[i++] = strdup(token);
+                    token = strtok(NULL, " ");
+                }
+                
+                free(str);
+            }
         }
-        
-        free(str);
     }
     
     g_extensionsLoaded = true;
@@ -97,7 +105,9 @@ void glExtensionsUnload(void) {
     
     if (g_extensionList) {
         for (int i = 0; i < g_extensionCount; i++) {
-            free(g_extensionList[i]);
+            if (g_extensionList[i]) {
+                free(g_extensionList[i]);
+            }
         }
         free(g_extensionList);
         g_extensionList = NULL;
@@ -112,12 +122,19 @@ void glExtensionsUnload(void) {
 // ============================================================================
 
 bool glExtensionSupported(const char* extension) {
-    if (!extension || !g_extensionsLoaded) return false;
+    if (!extension) return false;
+    
+    // Load extensions if not already loaded
+    if (!g_extensionsLoaded) {
+        glExtensionsLoad();
+    }
     
     // Check in list
-    for (int i = 0; i < g_extensionCount; i++) {
-        if (strcmp(g_extensionList[i], extension) == 0) {
-            return true;
+    if (g_extensionList) {
+        for (int i = 0; i < g_extensionCount; i++) {
+            if (g_extensionList[i] && strcmp(g_extensionList[i], extension) == 0) {
+                return true;
+            }
         }
     }
     
@@ -146,7 +163,7 @@ int glExtensionCount(void) {
 }
 
 const char* glExtensionGet(int index) {
-    if (index < 0 || index >= g_extensionCount) return NULL;
+    if (index < 0 || index >= g_extensionCount || !g_extensionList) return NULL;
     return g_extensionList[index];
 }
 
